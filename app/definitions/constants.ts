@@ -1,5 +1,5 @@
 // AI configuration map with metadata
-export const AI_CONFIG = {
+export const MODEL_CONFIG = {
   "dog-cat-classifier": {
     name: "Dog & Cat Classifier",
     description: "Classifies images as dogs or cats",

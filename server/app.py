@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 from controllers.conversations import get_conversations, create_conversation
 from database import Base, engine
+from models.ai.model_registry import model_registry
 
 # Load environment variables
 load_dotenv()
@@ -39,13 +40,24 @@ def home():
 
 @app.route("/api/conversations", methods=["GET"])
 def conversations_get():
-    ai_id = request.args.get("aiId")
+    ai_id = request.args.get("model_id")
     return get_conversations(ai_id)
 
 
 @app.route("/api/conversations", methods=["POST"])
 def conversations_create():
     return create_conversation(request.json)
+
+
+@app.route("/api/predict/<model_id>", methods=["POST"])
+def predict(model_id: str):
+    try:
+        model = model_registry.get_model(model_id)
+        input_data = request.json
+        prediction = model.predict(input_data)
+        return jsonify(prediction)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":

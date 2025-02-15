@@ -8,17 +8,17 @@ interface Conversation {
   id: string;
   title: string;
   createdAt: string;
-  aiId: string;
+  modelId: string;
 }
 
 interface SidebarProps {
-  aiId: string;
+  modelId: string;
   selectedConversationId: string | null;
   onSelectConversation: (id: string) => void;
 }
 
 export default function Sidebar({
-  aiId,
+  modelId,
   selectedConversationId,
   onSelectConversation,
 }: SidebarProps) {
@@ -28,7 +28,7 @@ export default function Sidebar({
 
   const fetchConversations = async () => {
     try {
-      const response = await fetch(`/api/conversations?aiId=${aiId}`);
+      const response = await fetch(`/api/conversations?model_id=${modelId}`);
       if (!response.ok) throw new Error("Failed to fetch conversations");
       const data = await response.json();
       setConversations(data);
@@ -41,14 +41,14 @@ export default function Sidebar({
 
   useEffect(() => {
     fetchConversations();
-  }, [aiId]);
+  }, [modelId]);
 
   const createNewConversation = async () => {
     try {
       const response = await fetch("/api/conversations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ aiId, title: "New Conversation" }),
+        body: JSON.stringify({ model_id: modelId, title: "New Conversation" }),
       });
 
       if (!response.ok) throw new Error("Failed to create conversation");

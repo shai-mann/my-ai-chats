@@ -3,17 +3,17 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ValidAIs, VALID_AIS } from "@/app/definitions/types";
-import { AI_CONFIG } from "@/app/definitions/constants";
+import { MODEL_CONFIG } from "@/app/definitions/constants";
 import { twMerge } from "tailwind-merge";
 
 interface DropdownProps {
-  selectedAi: ValidAIs;
-  onSelect: (ai: ValidAIs) => void;
+  selectedModel: ValidAIs;
+  onSelect: (model: ValidAIs) => void;
   className?: string;
 }
 
 export default function Dropdown({
-  selectedAi,
+  selectedModel,
   onSelect,
   className,
 }: DropdownProps) {
@@ -26,13 +26,13 @@ export default function Dropdown({
         className="flex items-center space-x-2 rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50"
       >
         <Image
-          src={AI_CONFIG[selectedAi].icon}
-          alt={AI_CONFIG[selectedAi].name}
+          src={MODEL_CONFIG[selectedModel].icon}
+          alt={MODEL_CONFIG[selectedModel].name}
           width={24}
           height={24}
           className="rounded-sm"
         />
-        <span>{AI_CONFIG[selectedAi].name}</span>
+        <span>{MODEL_CONFIG[selectedModel].name}</span>
       </button>
 
       {isOpen && (
@@ -47,16 +47,16 @@ export default function Dropdown({
               className="flex w-full items-center space-x-2 px-4 py-2 hover:bg-gray-50"
             >
               <Image
-                src={AI_CONFIG[ai].icon}
-                alt={AI_CONFIG[ai].name}
+                src={MODEL_CONFIG[ai].icon}
+                alt={MODEL_CONFIG[ai].name}
                 width={24}
                 height={24}
                 className="rounded-sm"
               />
               <div className="flex flex-col items-start">
-                <span className="font-medium">{AI_CONFIG[ai].name}</span>
+                <span className="font-medium">{MODEL_CONFIG[ai].name}</span>
                 <span className="text-sm text-gray-500">
-                  {AI_CONFIG[ai].description}
+                  {MODEL_CONFIG[ai].description}
                 </span>
               </div>
             </button>

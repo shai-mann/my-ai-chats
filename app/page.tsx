@@ -6,7 +6,7 @@ import { useState } from "react";
 import Dropdown from "./components/Dropdown";
 
 export default function Home() {
-  const [ai, setAi] = useState<ValidAIs>("dog-cat-classifier");
+  const [modelId, setModelId] = useState<ValidAIs>("dog-cat-classifier");
   const [selectedConversationId, setSelectedConversationId] = useState<
     string | null
   >(null);
@@ -15,14 +15,14 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center h-screen">
       <div className="flex h-full w-full">
         <Sidebar
-          aiId={ai}
+          modelId={modelId}
           selectedConversationId={selectedConversationId}
           onSelectConversation={setSelectedConversationId}
         />
         <div className="relative flex flex-1 flex-col items-center justify-center h-full">
           <Dropdown
-            selectedAi={ai}
-            onSelect={setAi}
+            selectedModel={modelId}
+            onSelect={setModelId}
             className="absolute top-4 left-6"
           />
           <h1 className="text-4xl font-bold">Shai's AI Bots</h1>
