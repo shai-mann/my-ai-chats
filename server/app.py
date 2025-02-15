@@ -7,6 +7,7 @@ from database import Base, engine
 from models.ai.model_registry import model_registry
 from controllers.messages import get_messages, create_message
 from init_db import init_db
+import sys
 
 # Load environment variables
 load_dotenv()
@@ -71,7 +72,6 @@ def messages_create():
 
         return create_message(conversation_id, content)
     except Exception as e:
-        print(f"Error creating message: {str(e)}")  # Add logging
         return jsonify({"error": "Failed to create message"}), 500
 
 
@@ -90,5 +90,14 @@ def predict(model_id: str):
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     host = os.getenv("HOST", "localhost")
-    init_db()
+
+    # Check for --drop-db flag
+    if "--drop-db" in sys.argv:
+        print("Dropping and recreating database...")
+        init_db()
+    else:
+        # Just ensure tables exist without dropping
+        print("Ensuring database exists...")
+        Base.metadata.create_all(bind=engine)
+
     app.run(host=host, port=port)
