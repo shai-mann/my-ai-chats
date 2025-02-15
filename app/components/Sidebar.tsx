@@ -11,29 +11,52 @@ interface Conversation {
   aiId: string;
 }
 
-export default function Sidebar({ aiId }: { aiId: string }) {
+interface SidebarProps {
+  aiId: string;
+  selectedConversationId: string | null;
+  onSelectConversation: (id: string) => void;
+}
+
+export default function Sidebar({
+  aiId,
+  selectedConversationId,
+  onSelectConversation,
+}: SidebarProps) {
   const pathname = usePathname();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const response = await fetch(`/api/conversations?aiId=${aiId}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch conversations");
-        }
-        const data = await response.json();
-        setConversations(data);
-      } catch (error) {
-        console.error("Error fetching conversations:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchConversations = async () => {
+    try {
+      const response = await fetch(`/api/conversations?aiId=${aiId}`);
+      if (!response.ok) throw new Error("Failed to fetch conversations");
+      const data = await response.json();
+      setConversations(data);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchConversations();
   }, [aiId]);
+
+  const createNewConversation = async () => {
+    try {
+      const response = await fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ aiId, title: "New Conversation" }),
+      });
+
+      if (!response.ok) throw new Error("Failed to create conversation");
+      await fetchConversations(); // Refetch the conversations list
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+    }
+  };
 
   return (
     <div className="flex h-full w-64 flex-col bg-gray-900 text-white">
@@ -42,12 +65,12 @@ export default function Sidebar({ aiId }: { aiId: string }) {
       </div>
 
       <div className="px-4 py-2">
-        <Link
-          href={`/chat/${aiId}/new`}
-          className="flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        <button
+          onClick={createNewConversation}
+          className="flex w-full items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
           New Chat
-        </Link>
+        </button>
       </div>
 
       <nav className="flex-1 space-y-1 px-2 py-4 overflow-y-auto">
@@ -61,12 +84,12 @@ export default function Sidebar({ aiId }: { aiId: string }) {
           </div>
         ) : (
           conversations.map((conversation) => {
-            const isActive = pathname === `/chat/${aiId}/${conversation.id}`;
+            const isActive = conversation.id === selectedConversationId;
             return (
-              <Link
+              <button
                 key={conversation.id}
-                href={`/chat/${aiId}/${conversation.id}`}
-                className={`group flex items-center rounded-md px-2 py-2 text-sm font-medium ${
+                onClick={() => onSelectConversation(conversation.id)}
+                className={`group flex w-full items-center rounded-md px-2 py-2 text-sm font-medium ${
                   isActive
                     ? "bg-gray-800 text-white"
                     : "text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -76,7 +99,7 @@ export default function Sidebar({ aiId }: { aiId: string }) {
                 <span className="ml-auto text-xs text-gray-500">
                   {new Date(conversation.createdAt).toLocaleDateString()}
                 </span>
-              </Link>
+              </button>
             );
           })
         )}

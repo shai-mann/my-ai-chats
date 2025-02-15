@@ -3,9 +3,13 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 from controllers.conversations import get_conversations, create_conversation
+from database import Base, engine
 
 # Load environment variables
 load_dotenv()
+
+# Initialize database
+Base.metadata.create_all(bind=engine)
 
 app = Flask(__name__)
 # Update CORS configuration
