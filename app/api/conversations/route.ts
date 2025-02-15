@@ -4,16 +4,22 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const aiId = searchParams.get("aiId");
+  const modelId = searchParams.get("model_id");
 
-  if (!aiId) {
-    return NextResponse.json({ error: "AI ID is required" }, { status: 400 });
+  if (!modelId) {
+    return NextResponse.json(
+      { error: "Model ID is required" },
+      { status: 400 }
+    );
   }
 
   try {
-    const response = await fetch(`${API_URL}/api/conversations?aiId=${aiId}`, {
-      method: "GET",
-    });
+    const response = await fetch(
+      `${API_URL}/api/conversations?model_id=${modelId}`,
+      {
+        method: "GET",
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch conversations");

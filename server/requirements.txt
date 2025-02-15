@@ -3,5 +3,7 @@ flask-cors==4.0.0
 python-dotenv==1.0.0
 SQLAlchemy==2.0.21
 Werkzeug==2.3.7
+numpy==1.24.3
 torch==2.1.0
-torchvision==0.16.0 
+torchvision==0.16.0
+pillow==10.0.0 
