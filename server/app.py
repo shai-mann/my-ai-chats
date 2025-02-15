@@ -63,16 +63,10 @@ def messages_create():
     try:
         conversation_id = request.args.get("conversation_id")
         data = request.get_json()  # Parse JSON body
-        if not data or "content" not in data:
-            return jsonify({"error": "Missing content in request body"}), 400
 
-        content = data["content"]
-        if not conversation_id:
-            return jsonify({"error": "Missing conversation_id parameter"}), 400
-
-        return create_message(conversation_id, content)
+        return create_message(conversation_id, data.get("content"))
     except Exception as e:
-        return jsonify({"error": "Failed to create message"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
 # Mainly for API usage - not used in the frontend

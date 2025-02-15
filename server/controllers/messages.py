@@ -37,22 +37,24 @@ def create_message(conversation_id: str, content: str):
         conversation = (
             db.query(Conversation).filter(Conversation.id == conversation_id).first()
         )
-        model = model_registry[conversation.model_id]
+        model = model_registry.get_model(conversation.model_id)
         # Trigger a prediction
-        prediction = model.predict(content)
+        prediction = model.predict({"content": content})
+
+        model_message = Message(
+            id=str(uuid.uuid4()),
+            conversation_id=conversation_id,
+            content=prediction.get(
+                "prediction"
+            ),  # store just the content of the prediction
+            role="ai",
+        )
 
         # Add the user's message and the AI's prediction to the conversation
         db.add(message)
-        db.add(
-            Message(
-                id=str(uuid.uuid4()),
-                conversation_id=conversation_id,
-                content=prediction,
-                role="ai",
-            )
-        )
+        db.add(model_message)
         db.commit()
 
-        return jsonify(prediction)
+        return jsonify(model_message.to_dict())
     finally:
         db.close()

@@ -1,7 +1,11 @@
 "use client";
 
 import Sidebar from "./components/Sidebar";
-import { ValidAIs, Message as MessageType } from "./definitions/types";
+import {
+  ValidAIs,
+  Message as MessageType,
+  ApiMessage as ApiMessageType,
+} from "./definitions/types";
 import { useEffect, useState } from "react";
 import Dropdown from "./components/Dropdown";
 import Message from "./components/Message";
@@ -17,6 +21,13 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<MessageType[]>([]);
 
+  const pushMessage = (message: MessageType) => {
+    setMessages((oldMessages) => {
+      const newMessages = [...oldMessages, message];
+      return newMessages.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    });
+  };
+
   useEffect(() => {
     if (selectedConversationId) {
       setMessages([]);
@@ -26,24 +37,27 @@ export default function Home() {
 
   const fetchMessages = async () => {
     setIsLoading(true);
-    const response = await fetch(
-      `/api/messages?conversation_id=${selectedConversationId}`
-    );
-    const data = await response.json();
-    setMessages(data);
-    setIsLoading(false);
+    try {
+      const response = await fetch(
+        `/api/messages?conversation_id=${selectedConversationId}`
+      );
+      const messages: MessageType[] = await response.json();
+      setMessages(messages);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSendMessage = async (message: string) => {
-    setMessages([
-      ...messages,
-      {
-        id: uuidv4(),
-        content: message,
-        role: "user",
-        createdAt: new Date().toISOString(),
-      },
-    ]);
+    pushMessage({
+      id: uuidv4(),
+      content: message,
+      role: "user",
+      createdAt: new Date().toISOString(),
+    });
+
     const response = await fetch(
       `/api/messages?conversation_id=${selectedConversationId}`,
       {
@@ -54,7 +68,13 @@ export default function Home() {
       }
     );
     const data = await response.json();
-    setMessages([...messages, data]);
+
+    if (data.error) {
+      console.error(data.error);
+      return;
+    }
+
+    pushMessage(data);
   };
 
   return (

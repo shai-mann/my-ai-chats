@@ -11,3 +11,11 @@ class Message(Base):
     content = Column(String, nullable=False)
     role = Column(String, nullable=False)  # user or ai, indicating who sent the message
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "content": self.content,
+            "role": self.role,
+            "created_at": self.created_at,
+        }
