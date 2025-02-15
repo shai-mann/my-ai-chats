@@ -3,11 +3,11 @@ export const MODEL_CONFIG = {
   "dog-cat-classifier": {
     name: "Dog & Cat Classifier",
     description: "Classifies images as dogs or cats",
-    icon: "/icons/dog-cat.jpeg", // You'll need to add this icon
+    icon: "/icons/dog-cat.jpeg",
   },
-  "fake-ai": {
-    name: "Fake AI",
-    description: "A fake AI that says fake things",
-    icon: "/icons/fake-ai.jpeg", // You'll need to add this icon
+  "parrot-model": {
+    name: "Parrot",
+    description: "A parrot that repeats what the user says",
+    icon: "/icons/parrot.jpeg",
   },
 } as const;

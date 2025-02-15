@@ -5,6 +5,8 @@ import os
 from controllers.conversations import get_conversations, create_conversation
 from database import Base, engine
 from models.ai.model_registry import model_registry
+from controllers.messages import get_messages, create_message
+from init_db import init_db
 
 # Load environment variables
 load_dotenv()
@@ -49,6 +51,20 @@ def conversations_create():
     return create_conversation(request.json)
 
 
+@app.route("/api/messages", methods=["GET"])
+def messages_get():
+    conversation_id = request.args.get("conversation_id")
+    return get_messages(conversation_id)
+
+
+@app.route("/api/messages", methods=["POST"])
+def messages_create():
+    conversation_id = request.json.get("conversation_id")
+    content = request.json.get("content")
+    return create_message(conversation_id, content)
+
+
+# Mainly for API usage - not used in the frontend
 @app.route("/api/predict/<model_id>", methods=["POST"])
 def predict(model_id: str):
     try:
@@ -63,4 +79,5 @@ def predict(model_id: str):
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     host = os.getenv("HOST", "localhost")
+    init_db()
     app.run(host=host, port=port)

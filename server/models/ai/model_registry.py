@@ -1,6 +1,7 @@
 from typing import Dict, Type
 from .base_model import BaseAIModel
 from .dog_cat_classifier import DogCatClassifier
+from .parrot_model import ParrotModel
 
 
 class ModelRegistry:
@@ -8,6 +9,7 @@ class ModelRegistry:
         self._models: Dict[str, BaseAIModel] = {}
         self._model_classes: Dict[str, Type[BaseAIModel]] = {
             "dog-cat-classifier": DogCatClassifier,
+            "parrot-model": ParrotModel,
         }
 
     def get_model(self, model_id: str) -> BaseAIModel:

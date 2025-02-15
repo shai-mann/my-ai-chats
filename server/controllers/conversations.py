@@ -1,5 +1,4 @@
 from flask import jsonify, request
-from datetime import datetime
 import uuid
 from models.conversation import Conversation
 from database import SessionLocal
@@ -36,7 +35,6 @@ def create_conversation(data: dict):
             id=str(uuid.uuid4()),
             title=data.get("title", "New Conversation"),
             model_id=data.get("model_id"),
-            created_at=datetime.utcnow(),
         )
         db.add(conversation)
         db.commit()
