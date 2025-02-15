@@ -5,16 +5,21 @@ from models.conversation import Conversation
 from database import SessionLocal
 
 
-def get_conversations(ai_id: str):
+def get_conversations(model_id: str):
     db = SessionLocal()
     try:
-        conversations = db.query(Conversation).filter(Conversation.ai_id == ai_id).all()
+        conversations = (
+            db.query(Conversation)
+            .filter(Conversation.model_id == model_id)
+            .order_by(Conversation.created_at.desc())
+            .all()
+        )
         return jsonify(
             [
                 {
                     "id": conv.id,
                     "title": conv.title,
-                    "aiId": conv.ai_id,
+                    "modelId": conv.model_id,
                     "createdAt": conv.created_at.isoformat(),
                 }
                 for conv in conversations
@@ -30,7 +35,7 @@ def create_conversation(data: dict):
         conversation = Conversation(
             id=str(uuid.uuid4()),
             title=data.get("title", "New Conversation"),
-            ai_id=data.get("aiId"),
+            model_id=data.get("model_id"),
             created_at=datetime.utcnow(),
         )
         db.add(conversation)
@@ -39,7 +44,7 @@ def create_conversation(data: dict):
             {
                 "id": conversation.id,
                 "title": conversation.title,
-                "aiId": conversation.ai_id,
+                "modelId": conversation.model_id,
                 "createdAt": conversation.created_at.isoformat(),
             }
         )
