@@ -38,7 +38,6 @@ def create_message(conversation_id: str, content: str):
             db.query(Conversation).filter(Conversation.id == conversation_id).first()
         )
         model = model_registry[conversation.model_id]
-
         # Trigger a prediction
         prediction = model.predict(content)
 
