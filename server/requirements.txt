@@ -6,4 +6,7 @@ Werkzeug==2.3.7
 numpy==1.24.3
 torch==2.1.0
 torchvision==0.16.0
-pillow==10.0.0 
+pillow==10.0.0
+flask-socketio==5.3.6
+python-socketio==5.11.1
+eventlet==0.35.2  # Better async support for Flask-SocketIO 

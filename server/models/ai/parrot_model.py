@@ -1,6 +1,6 @@
-import torch
 import torch.nn as nn
 from .base_model import BaseAIModel
+import time
 
 
 # This model is a parrot that repeats what the user says
@@ -9,6 +9,8 @@ class ParrotModel(BaseAIModel, nn.Module):
         super(ParrotModel, self).__init__()
 
     def predict(self, input_data: dict) -> dict:
+        time.sleep(1)  # make it seem like it's crunching the numbers
+        print("Predicting...")
         # This fake model just returns the user's message
         return {"prediction": input_data.get("content")}
 

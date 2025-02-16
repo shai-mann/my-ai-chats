@@ -1,16 +1,13 @@
 "use client";
 
 import Sidebar from "./components/Sidebar";
-import {
-  ValidAIs,
-  Message as MessageType,
-  ApiMessage as ApiMessageType,
-} from "./definitions/types";
+import { ValidAIs, Message as MessageType } from "./definitions/types";
 import { useEffect, useState } from "react";
 import Dropdown from "./components/Dropdown";
 import Message from "./components/Message";
 import { v4 as uuidv4 } from "uuid";
 import TextBox from "./components/TextBox";
+import { useWebSocket } from "./hooks/useWebSocket";
 
 export default function Home() {
   const [modelId, setModelId] = useState<ValidAIs>("dog-cat-classifier");
@@ -21,12 +18,13 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<MessageType[]>([]);
 
-  const pushMessage = (message: MessageType) => {
-    setMessages((oldMessages) => {
-      const newMessages = [...oldMessages, message];
-      return newMessages.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-    });
-  };
+  const { sendMessage, isConnected } = useWebSocket(
+    selectedConversationId,
+    (message) => {
+      console.log("Received message in page:", message);
+      pushMessage(message);
+    }
+  );
 
   useEffect(() => {
     if (selectedConversationId) {
@@ -35,6 +33,20 @@ export default function Home() {
     }
   }, [selectedConversationId]);
 
+  useEffect(() => {
+    setSelectedConversationId(null);
+    setMessages([]);
+  }, [modelId]);
+
+  const pushMessage = (message: MessageType) => {
+    setMessages((oldMessages) => {
+      const newMessages = [...oldMessages, message];
+      return newMessages.sort(
+        (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+      );
+    });
+  };
+
   const fetchMessages = async () => {
     setIsLoading(true);
     try {
@@ -42,7 +54,14 @@ export default function Home() {
         `/api/messages?conversation_id=${selectedConversationId}`
       );
       const messages: MessageType[] = await response.json();
-      setMessages(messages);
+      console.log("Messages:", messages);
+      setMessages(
+        messages.map((message) => ({
+          ...message,
+          // Ensure createdAt is a Date object
+          createdAt: new Date(message.createdAt),
+        }))
+      );
     } catch (error) {
       console.error("Error fetching messages:", error);
     } finally {
@@ -50,31 +69,15 @@ export default function Home() {
     }
   };
 
-  const handleSendMessage = async (message: string) => {
+  const handleSendMessage = (message: string) => {
+    console.log("Sending message:", message, messages);
     pushMessage({
       id: uuidv4(),
       content: message,
       role: "user",
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
     });
-
-    const response = await fetch(
-      `/api/messages?conversation_id=${selectedConversationId}`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          content: message,
-        }),
-      }
-    );
-    const data = await response.json();
-
-    if (data.error) {
-      console.error(data.error);
-      return;
-    }
-
-    pushMessage(data);
+    sendMessage(message);
   };
 
   return (
@@ -110,7 +113,7 @@ export default function Home() {
             )}
             <TextBox
               onSubmit={handleSendMessage}
-              disabled={!selectedConversationId || isLoading}
+              disabled={!selectedConversationId || isLoading || !isConnected}
             />
           </div>
         </div>

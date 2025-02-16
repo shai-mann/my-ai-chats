@@ -15,6 +15,8 @@ def get_messages(conversation_id: str):
             .order_by(Message.created_at.desc())
             .all()
         )
+        for message in messages:
+            message.created_at = message.created_at.isoformat()  # Convert to ISO string
         return jsonify([message.to_dict() for message in messages])
     finally:
         db.close()
@@ -39,6 +41,7 @@ def create_message(conversation_id: str, content: str):
         )
         model = model_registry.get_model(conversation.model_id)
         # Trigger a prediction
+        print("Predicting... (controller)")
         prediction = model.predict({"content": content})
 
         model_message = Message(
@@ -55,6 +58,7 @@ def create_message(conversation_id: str, content: str):
         db.add(model_message)
         db.commit()
 
-        return jsonify(model_message.to_dict())
+        # Send the message to the client
+        return model_message.to_dict()
     finally:
         db.close()

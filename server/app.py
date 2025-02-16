@@ -1,3 +1,7 @@
+import eventlet
+
+eventlet.monkey_patch()
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -5,18 +9,15 @@ import os
 from controllers.conversations import get_conversations, create_conversation
 from database import Base, engine
 from models.ai.model_registry import model_registry
-from controllers.messages import get_messages, create_message
+from controllers.messages import get_messages
 from init_db import init_db
 import sys
+from websocket_server import socketio
 
 # Load environment variables
 load_dotenv()
 
-# Initialize database
-Base.metadata.create_all(bind=engine)
-
 app = Flask(__name__)
-# Update CORS configuration
 CORS(
     app,
     resources={
@@ -27,6 +28,9 @@ CORS(
         }
     },
 )
+
+# Initialize WebSocket
+socketio.init_app(app)
 
 # Configure app from environment
 app.config.update(
@@ -58,17 +62,6 @@ def messages_get():
     return get_messages(conversation_id)
 
 
-@app.route("/api/messages", methods=["POST"])
-def messages_create():
-    try:
-        conversation_id = request.args.get("conversation_id")
-        data = request.get_json()  # Parse JSON body
-
-        return create_message(conversation_id, data.get("content"))
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
 # Mainly for API usage - not used in the frontend
 @app.route("/api/predict/<model_id>", methods=["POST"])
 def predict(model_id: str):
@@ -90,8 +83,14 @@ if __name__ == "__main__":
         print("Dropping and recreating database...")
         init_db()
     else:
-        # Just ensure tables exist without dropping
         print("Ensuring database exists...")
         Base.metadata.create_all(bind=engine)
 
-    app.run(host=host, port=port)
+    print(f"Starting WebSocket server at {host}:{port}")
+    socketio.run(
+        app,
+        host=host,
+        port=port,
+        debug=True,
+        use_reloader=False,  # Disable reloader to avoid duplicate threads
+    )

@@ -6,12 +6,12 @@ export interface ApiMessage {
   id: string;
   content: string;
   role: "user" | "ai";
-  created_at: string;
+  created_at: number;
 }
 
 export interface Message {
   id: string;
   content: string;
   role: "user" | "ai";
-  createdAt: string;
+  createdAt: Date;
 }
