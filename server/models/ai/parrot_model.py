@@ -10,7 +10,6 @@ class ParrotModel(BaseAIModel, nn.Module):
 
     def predict(self, input_data: dict) -> dict:
         time.sleep(1)  # make it seem like it's crunching the numbers
-        print("Predicting...")
         # This fake model just returns the user's message
         return {"prediction": input_data.get("content")}
 

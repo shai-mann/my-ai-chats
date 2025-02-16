@@ -41,7 +41,6 @@ def create_message(conversation_id: str, content: str):
         )
         model = model_registry.get_model(conversation.model_id)
         # Trigger a prediction
-        print("Predicting... (controller)")
         prediction = model.predict({"content": content})
 
         model_message = Message(
