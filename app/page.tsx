@@ -10,7 +10,7 @@ import TextBox from "./components/TextBox";
 import { useWebSocket } from "./hooks/useWebSocket";
 
 export default function Home() {
-  const [modelId, setModelId] = useState<ValidAIs>("dog-cat-classifier");
+  const [modelId, setModelId] = useState<ValidAIs>("parrot-model");
   const [selectedConversationId, setSelectedConversationId] = useState<
     string | null
   >(null);
@@ -21,7 +21,6 @@ export default function Home() {
   const { sendMessage, isConnected } = useWebSocket(
     selectedConversationId,
     (message) => {
-      console.log("Received message in page:", message);
       pushMessage(message);
     }
   );
@@ -41,6 +40,7 @@ export default function Home() {
   const pushMessage = (message: MessageType) => {
     setMessages((oldMessages) => {
       const newMessages = [...oldMessages, message];
+      console.log("New messages:", newMessages);
       return newMessages.sort(
         (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
       );
@@ -54,7 +54,6 @@ export default function Home() {
         `/api/messages?conversation_id=${selectedConversationId}`
       );
       const messages: MessageType[] = await response.json();
-      console.log("Messages:", messages);
       setMessages(
         messages.map((message) => ({
           ...message,
@@ -70,7 +69,6 @@ export default function Home() {
   };
 
   const handleSendMessage = (message: string) => {
-    console.log("Sending message:", message, messages);
     pushMessage({
       id: uuidv4(),
       content: message,

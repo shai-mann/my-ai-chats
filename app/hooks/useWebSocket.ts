@@ -38,7 +38,6 @@ export function useWebSocket(
       });
 
       socketRef.current.on("connect", () => {
-        console.log("Socket connected");
         reconnectAttempts.current = 0;
       });
 
@@ -48,7 +47,6 @@ export function useWebSocket(
       });
 
       socketRef.current.on("disconnect", (reason) => {
-        console.log("Socket disconnected:", reason);
         if (reason === "io server disconnect") {
           // Server disconnected us, try to reconnect
           connect();
@@ -84,7 +82,6 @@ export function useWebSocket(
 
     return () => {
       if (socketRef.current) {
-        console.log("Cleaning up socket connection");
         socketRef.current.disconnect();
         socketRef.current = null;
       }
@@ -93,7 +90,6 @@ export function useWebSocket(
 
   const sendMessage = useCallback(
     (content: string) => {
-      console.log("Sending message:", content);
       if (!socketRef.current?.connected) {
         console.error("Socket not connected");
         return;
