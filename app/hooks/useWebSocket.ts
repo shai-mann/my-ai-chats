@@ -11,7 +11,7 @@ const isValidMessage = (message: any): message is ApiMessage => {
     typeof message.id === "string" &&
     typeof message.content === "string" &&
     (message.role === "user" || message.role === "ai") &&
-    typeof message.created_at === "number"
+    !isNaN(parseInt(message.created_at))
   );
 };
 
