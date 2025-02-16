@@ -92,5 +92,6 @@ if __name__ == "__main__":
         host=host,
         port=port,
         debug=True,
-        use_reloader=False,  # Disable reloader to avoid duplicate threads
+        use_reloader=True,  # Enable hot reloading
+        log_output=True,  # Show more detailed logs
     )
