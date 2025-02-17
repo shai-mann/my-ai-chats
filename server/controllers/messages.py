@@ -4,6 +4,7 @@ from models.conversation import Conversation
 from database import SessionLocal
 import uuid
 from models.ai.model_registry import model_registry
+from datetime import datetime, timezone
 
 
 def get_messages(conversation_id: str):
@@ -28,6 +29,7 @@ def create_message(conversation_id: str, content: str):
             conversation_id=conversation_id,
             content=content,
             role="user",
+            created_at=datetime.now(),
         )
 
         # When a new message is sent, we need to trigger a prediction and return it to the user.
@@ -48,6 +50,7 @@ def create_message(conversation_id: str, content: str):
                 "prediction"
             ),  # store just the content of the prediction
             role="ai",
+            created_at=datetime.now(),
         )
 
         # Add the user's message and the AI's prediction to the conversation

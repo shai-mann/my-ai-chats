@@ -52,6 +52,7 @@ export default function Home() {
         `/api/messages?conversation_id=${selectedConversationId}`
       );
       const messages: MessageType[] = await response.json();
+      console.log(messages);
       setMessages(
         messages.map((message) => ({
           ...message,
