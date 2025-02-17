@@ -15,8 +15,6 @@ def get_messages(conversation_id: str):
             .order_by(Message.created_at.desc())
             .all()
         )
-        for message in messages:
-            message.created_at = message.created_at.isoformat()  # Convert to ISO string
         return jsonify([message.to_dict() for message in messages])
     finally:
         db.close()

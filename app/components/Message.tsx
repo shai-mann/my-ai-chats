@@ -22,7 +22,12 @@ export default function Message({ message }: MessageProps) {
           {message.role === "ai" ? "AI" : "U"}
         </div>
         <div className="flex-1 space-y-2">
-          <p className="prose">{message.content}</p>
+          <div className="flex justify-between items-start">
+            <p className="prose">{message.content}</p>
+            <span className="text-xs text-gray-500">
+              {message.createdAt.toLocaleTimeString()}
+            </span>
+          </div>
         </div>
       </div>
     </div>

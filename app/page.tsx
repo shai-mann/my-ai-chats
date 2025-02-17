@@ -27,7 +27,6 @@ export default function Home() {
 
   useEffect(() => {
     if (selectedConversationId) {
-      setMessages([]);
       fetchMessages();
     }
   }, [selectedConversationId]);
@@ -40,7 +39,6 @@ export default function Home() {
   const pushMessage = (message: MessageType) => {
     setMessages((oldMessages) => {
       const newMessages = [...oldMessages, message];
-      console.log("New messages:", newMessages);
       return newMessages.sort(
         (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
       );
@@ -57,7 +55,6 @@ export default function Home() {
       setMessages(
         messages.map((message) => ({
           ...message,
-          // Ensure createdAt is a Date object
           createdAt: new Date(message.createdAt),
         }))
       );
@@ -73,7 +70,7 @@ export default function Home() {
       id: uuidv4(),
       content: message,
       role: "user",
-      createdAt: new Date(),
+      createdAt: new Date(), // Local time is correct for new messages
     });
     sendMessage(message);
   };

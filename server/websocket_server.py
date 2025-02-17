@@ -28,13 +28,13 @@ def handle_messages(data):
             content = data.get("content")
 
             if not conversation_id or not content:
-                return
+                raise ValueError("Missing conversation_id or content")
 
             model_reply = create_message(conversation_id, content)
-            model_reply["created_at"] = model_reply["created_at"].isoformat()
             socketio.emit("message", model_reply)
 
         except Exception as e:
+            print(f"Error creating message: {e}")
             socketio.emit("error", {"message": "Failed to process message"})
 
     eventlet.spawn(async_create_message)

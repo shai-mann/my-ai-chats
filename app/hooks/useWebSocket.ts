@@ -15,25 +15,25 @@ const isValidMessage = (message: any): message is ApiMessage => {
   );
 };
 
+const MAX_RECONNECT_ATTEMPTS = 3;
+
 export function useWebSocket(
   conversationId: string | null,
   onMessage: (message: Message) => void
 ) {
   const socketRef = useRef<Socket | null>(null);
   const reconnectAttempts = useRef(0);
-  const maxReconnectAttempts = 3;
 
   const connect = useCallback(() => {
-    if (reconnectAttempts.current >= maxReconnectAttempts) {
-      console.error("Max reconnection attempts reached");
-      return;
+    if (reconnectAttempts.current >= MAX_RECONNECT_ATTEMPTS) {
+      throw new Error("Max reconnection attempts reached");
     }
 
     try {
       socketRef.current = io(API_URL!, {
         transports: ["websocket"],
         reconnection: true,
-        reconnectionAttempts: 3,
+        reconnectionAttempts: MAX_RECONNECT_ATTEMPTS,
         reconnectionDelay: 1000,
       });
 
@@ -42,8 +42,8 @@ export function useWebSocket(
       });
 
       socketRef.current.on("connect_error", (error) => {
-        console.error("Socket connection error:", error);
         reconnectAttempts.current++;
+        throw new Error(`Socket connection error: ${error}`);
       });
 
       socketRef.current.on("disconnect", (reason) => {
@@ -55,23 +55,21 @@ export function useWebSocket(
 
       socketRef.current.on("message", (data: unknown) => {
         if (!isValidMessage(data)) {
-          console.error("Received invalid message format:", data);
-          return;
+          throw new Error(`Received invalid message format: ${data}`);
         }
 
-        try {
-          const message: Message = {
-            ...data,
-            createdAt: new Date(data.created_at),
-          };
-          onMessage(message);
-        } catch (error) {
-          console.error("Error processing message:", error);
-        }
+        const message: Message = {
+          ...data,
+          createdAt: new Date(data.created_at),
+        };
+        onMessage(message);
+      });
+
+      socketRef.current.on("error", (error) => {
+        throw error;
       });
     } catch (error) {
-      console.error("Error creating socket connection:", error);
-      reconnectAttempts.current++;
+      throw new Error(`Error creating socket connection: ${error}`);
     }
   }, []);
 
@@ -91,23 +89,17 @@ export function useWebSocket(
   const sendMessage = useCallback(
     (content: string) => {
       if (!socketRef.current?.connected) {
-        console.error("Socket not connected");
-        return;
+        throw new Error("Socket not connected");
       }
 
       if (!conversationId) {
-        console.error("No conversation ID");
-        return;
+        throw new Error("No conversation ID");
       }
 
-      try {
-        socketRef.current.emit("send_message", {
-          conversation_id: conversationId,
-          content,
-        });
-      } catch (error) {
-        console.error("Error sending message:", error);
-      }
+      socketRef.current.emit("send_message", {
+        conversation_id: conversationId,
+        content,
+      });
     },
     [conversationId]
   );
