@@ -7,26 +7,19 @@ interface MessageProps {
 export default function Message({ message }: MessageProps) {
   return (
     <div
-      className={`w-full px-4 py-8 flex ${
-        message.role === "ai"
-          ? "bg-gray-50 border-b border-black/10"
-          : "bg-white"
-      }`}
+      className={`py-6 ${message.role === "ai" ? "bg-gray-50" : "bg-white"}`}
     >
-      <div className="max-w-3xl mx-auto flex space-x-6 w-full">
+      <div className="max-w-3xl mx-auto px-4 flex gap-4">
         <div
-          className={`w-8 h-8 rounded-sm flex items-center justify-center ${
-            message.role === "ai" ? "bg-green-500" : "bg-blue-500"
-          }`}
+          className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm text-white shrink-0
+            ${message.role === "ai" ? "bg-emerald-500" : "bg-blue-500"}`}
         >
           {message.role === "ai" ? "AI" : "U"}
         </div>
-        <div className="flex-1 space-y-2">
-          <div className="flex justify-between items-start">
-            <p className="prose">{message.content}</p>
-            <span className="text-xs text-gray-500">
-              {message.createdAt.toLocaleTimeString()}
-            </span>
+        <div className="flex-1 min-w-0">
+          <div className="prose max-w-none">{message.content}</div>
+          <div className="mt-2 text-xs text-gray-500">
+            {message.createdAt.toLocaleTimeString()}
           </div>
         </div>
       </div>

@@ -77,41 +77,49 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <div className="flex h-full w-full">
-        <Sidebar
-          modelId={modelId}
-          selectedConversationId={selectedConversationId}
-          onSelectConversation={setSelectedConversationId}
-        />
-        <div className="flex flex-1 flex-col h-full">
-          <div className="flex justify-start p-4 w-full">
-            <Dropdown
-              selectedModel={modelId}
-              onSelect={setModelId}
-              className=""
-            />
-          </div>
-          <div className="flex-1 overflow-y-auto pb-36">
-            {isLoading ? (
-              <p className="text-center py-4 text-gray-600">
-                Loading messages...
-              </p>
-            ) : messages.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center">
-                <h1 className="text-4xl font-bold">Shai's AI Bots</h1>
-                <p className="text-lg">Where fun goes to dAI</p>
-              </div>
-            ) : (
-              messages.map((message) => (
+    <div className="flex h-screen bg-white">
+      {/* Sidebar */}
+      <Sidebar
+        modelId={modelId}
+        selectedConversationId={selectedConversationId}
+        onSelectConversation={setSelectedConversationId}
+      />
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Header */}
+        <header className="h-14 border-b border-gray-200 flex items-center px-4 shrink-0">
+          <Dropdown selectedModel={modelId} onSelect={setModelId} />
+        </header>
+
+        {/* Messages Area */}
+        <div className="flex-1 overflow-y-auto">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-gray-500">Loading messages...</div>
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-gray-500">
+              <h1 className="text-2xl font-semibold mb-2">
+                Welcome to AI Bots
+              </h1>
+              <p>Select a conversation or start a new one</p>
+            </div>
+          ) : (
+            <div className="pb-32">
+              {messages.map((message) => (
                 <Message key={message.id} message={message} />
-              ))
-            )}
-            <TextBox
-              onSubmit={handleSendMessage}
-              disabled={!selectedConversationId || isLoading || !isConnected}
-            />
-          </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Input Area */}
+        <div className="border-t border-gray-200">
+          <TextBox
+            onSubmit={handleSendMessage}
+            disabled={!selectedConversationId || isLoading || !isConnected}
+          />
         </div>
       </div>
     </div>
